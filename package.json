@@ -36,5 +36,6 @@
     "dependencies": {
       "jquery": ">=1.7.2"
     }
-  }
+  },
+  "github": "http://github.com/shama/jmpress.js"
 }
