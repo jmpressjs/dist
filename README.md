@@ -1,8 +1,8 @@
-# jmpress.js (Version 0.4.3)
+# jmpress.js (Version 0.4.4)
 
 > A jQuery plugin to build a website on the infinite canvas.
 
-This is distribution branch of jmpress.js. Please use [the main branch](https://github.com/shama/jmpress.js) for development.
+This is distribution branch of jmpress.js. Please use [the main branch](https://github.com/jmpressjs/jmpress.js) for development.
 
 ## Install with [JamJS](http://jamjs.org)
 

@@ -1,17 +1,15 @@
 /*!
- * jmpress.js v0.4.3
- * http://shama.github.com/jmpress.js
+ * jmpress.js v0.4.4
+ * http://jmpressjs.github.com/jmpress.js
  *
  * A jQuery plugin to build a website on the infinite canvas.
  *
- * Copyright 2012 Kyle Robinson Young @shama & Tobias Koppers @sokra
+ * Copyright 2013 Kyle Robinson Young @shama & Tobias Koppers @sokra
  * Licensed MIT
  * http://www.opensource.org/licenses/mit-license.php
  *
  * Based on the foundation laid by Bartek Szopka @bartaz
- */
-
-/*!
+ *//*
  * core.js
  * The core of jmpress.js
  */
@@ -62,6 +60,15 @@
 			return "";
 		}
 		return attribute + ",";
+	}
+	/**
+	 * Return an jquery object only if it's not empty
+	 */
+	function ifNotEmpty(el) {
+		if(el.length > 0) {
+			return el;
+		}
+		return null;
 	}
 
 	/**
@@ -309,14 +316,6 @@
 				return false;
 			}
 
-			// Sometimes it's possible to trigger focus on first link with some keyboard action.
-			// Browser in such a case tries to scroll the page to make this element visible
-			// (even that body overflow is set to hidden) and it breaks our careful positioning.
-			//
-			// So, as a lousy (and lazy) workaround we will make the page scroll back to the top
-			// whenever slide is selected
-			//
-			// If you are reading this and know any better way to handle it, I'll be glad to hear about it!
 			scrollFix.call(this);
 
 			var step = $(el).data('stepData');
@@ -337,11 +336,16 @@
 
 			var delegated = el;
 			if($(el).data("stepData").delegate) {
-				delegated = $(el).parentsUntil(jmpress).filter(settings.stepSelector).filter(step.delegate) ||
-					$(el).near(step.delegate) ||
-					$(el).near(step.delegate, true) ||
-					$(step.delegate, jmpress);
-				step = delegated.data("stepData");
+				delegated = ifNotEmpty($(el).parentsUntil(jmpress).filter(settings.stepSelector).filter(step.delegate)) ||
+					ifNotEmpty($(el).near(step.delegate)) ||
+					ifNotEmpty($(el).near(step.delegate, true)) ||
+					ifNotEmpty($(step.delegate, jmpress));
+				if(delegated) {
+					step = delegated.data("stepData");
+				} else {
+					// Do not delegate if expression not found
+					delegated = el;
+				}
 			}
 			if ( activeDelegated ) {
 				callCallback.call(this, 'setInactive', activeDelegated, {
@@ -400,7 +404,7 @@
 		 * This should fix ANY kind of buggy scrolling
 		 */
 		function scrollFix() {
-			function fix() {
+			(function fix() {
 				if ($(container)[0].tagName === "BODY") {
 					try {
 						window.scrollTo(0, 0);
@@ -419,8 +423,7 @@
 				setTimeout(check, 100);
 				setTimeout(check, 200);
 				setTimeout(check, 400);
-			}
-			fix();
+			}());
 		}
 		/**
 		 * Alias for select
@@ -544,8 +547,7 @@
 		 */
 		function checkSupport() {
 			var ua = navigator.userAgent.toLowerCase();
-			var supported = ( ua.search(/(iphone)|(ipod)|(android)/) === -1 );
-			return supported;
+			return (ua.search(/(iphone)|(ipod)|(android)/) === -1) || (ua.search(/(chrome)/) !== -1);
 		}
 
 		// BEGIN INIT
@@ -788,7 +790,8 @@
 	});
 
 }(jQuery, document, window));
-/*!
+
+/*
  * near.js
  * Find steps near each other
  */
@@ -865,7 +868,7 @@
 		return $(array);
 	};
 }(jQuery, document, window));
-/*!
+/*
  * transform.js
  * The engine that powers the transforms or falls back to other methods
  */
@@ -874,9 +877,6 @@
 	'use strict';
 
 	/* FUNCTIONS */
-	function randomString() {
-		return "" + Math.round(Math.random() * 100000, 0);
-	}
 	function toCssNumber(number) {
 		return (Math.round(10000*number)/10000)+"";
 	}
@@ -1171,7 +1171,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * active.js
  * Set the active classes on steps
  */
@@ -1218,7 +1218,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * circular.js
  * Repeat from start after end
  */
@@ -1266,7 +1266,7 @@
 		return prevOrNext(this, step, eventData);
 	});
 }(jQuery, document, window));
-/*!
+/*
  * start.js
  * Set the first step to start on
  */
@@ -1280,7 +1280,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * ways.js
  * Control the flow of the steps
  */
@@ -1290,9 +1290,6 @@
 	var $jmpress = $.jmpress;
 
 	/* FUNCTIONS */
-	function randomString() {
-		return "" + Math.round(Math.random() * 100000, 0);
-	}
 	function routeFunc( jmpress, route, type ) {
 		for(var i = 0; i < route.length - 1; i++) {
 			var from = route[i];
@@ -1343,7 +1340,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * ajax.js
  * Load steps via ajax
  */
@@ -1422,7 +1419,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * hash.js
  * Detect and set the URL hash
  */
@@ -1530,7 +1527,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * keyboard.js
  * Keyboard event mapping and default keyboard actions
  */
@@ -1693,7 +1690,7 @@
 
 
 }(jQuery, document, window));
-/*!
+/*
  * viewport.js
  * Scale to fit a given viewport
  */
@@ -1704,6 +1701,17 @@
 	function randomString() {
 		return "" + Math.round(Math.random() * 100000, 0);
 	}
+
+	var browser = (function() {
+		var ua = navigator.userAgent.toLowerCase();
+		var match = /(chrome)[ \/]([\w.]+)/.exec(ua) ||
+			/(webkit)[ \/]([\w.]+)/.exec(ua) ||
+			/(opera)(?:.*version|)[ \/]([\w.]+)/.exec(ua) ||
+			/(msie) ([\w.]+)/.exec(ua) ||
+			ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua) ||
+			[];
+		return match[1] || "";
+	}());
 
 	var defaults = $.jmpress("defaults");
 	defaults.viewPort = {
@@ -1716,8 +1724,8 @@
 		,zoomBindWheel: true
 	};
 	var keys = defaults.keyboard.keys;
-	keys[$.browser.mozilla?107:187] = "zoomIn";  // +
-	keys[$.browser.mozilla?109:189] = "zoomOut"; // -
+	keys[browser === 'mozilla' ? 107 : 187] = "zoomIn";  // +
+	keys[browser === 'mozilla' ? 109 : 189] = "zoomOut"; // -
 	defaults.reasonableAnimation.resize = {
 		transitionDuration: '0s'
 		,transitionDelay: '0ms'
@@ -1834,6 +1842,7 @@
 		$(this).jmpress("reselect", "zoom");
 	});
 	$.jmpress('afterDeinit', function( nil, eventData ) {
+		$(eventData.settings.fullscreen ? document : this).unbind(eventData.current.viewPortNamespace);
 		$(window).unbind(eventData.current.viewPortNamespace);
 	});
 	$.jmpress("setActive", function( step, eventData ) {
@@ -1887,7 +1896,8 @@
 	});
 
 }(jQuery, document, window));
-/*!
+
+/*
  * mouse.js
  * Clicking to select a step
  */
@@ -1939,7 +1949,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * mobile.js
  * Adds support for swipe on touch supported browsers
  */
@@ -1990,7 +2000,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * templates.js
  * The amazing template engine
  */
@@ -2005,9 +2015,6 @@
 	var templates = {};
 
 	/* FUNCTIONS */
-	function randomString() {
-		return "" + Math.round(Math.random() * 100000, 0);
-	}
 	function addUndefined( target, values, prefix ) {
 		for( var name in values ) {
 			var targetName = name;
@@ -2126,7 +2133,7 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * jqevents.js
  * Fires jQuery events
  */
@@ -2149,17 +2156,13 @@
 	});
 
 }(jQuery, document, window));
-/*!
+/*
  * animation.js
  * Apply custom animations to steps
  */
 (function( $, document, window, undefined ) {
 
 	'use strict';
-
-	function randomString() {
-		return "" + Math.round(Math.random() * 100000, 0);
-	}
 
 	function parseSubstepInfo(str) {
 		var arr = str.split(" ");
@@ -2189,6 +2192,7 @@
 					config.delay = value;
 				} else {
 					config.after = Array.prototype.slice.call(arr, i).join(" ");
+					i = arr.length;
 				}
 			}
 		}
@@ -2244,10 +2248,10 @@
 					other = listOfSubsteps[idx-1];
 				} else {
 					var index = find(listOfSubsteps, other, 0, idx - 1);
-					if(index === -1) {
+					if(index === undefined) {
 						index = find(listOfSubsteps, other);
 					}
-					other = (index === -1 || index === idx) ? listOfSubsteps[idx-1] : listOfSubsteps[index];
+					other = (index === undefined || index === idx) ? listOfSubsteps[idx-1] : listOfSubsteps[index];
 				}
 			} else {
 				other = listOfSubsteps[idx-1];
