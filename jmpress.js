@@ -1,5 +1,5 @@
 /*!
- * jmpress.js v0.4.4
+ * jmpress.js v0.4.5
  * http://jmpressjs.github.com/jmpress.js
  *
  * A jQuery plugin to build a website on the infinite canvas.
