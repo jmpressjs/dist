@@ -1,0 +1,16 @@
+{
+  "name": "jmpress",
+  "version": "0.4.5",
+  "homepage": "https://github.com/jmpressjs/jmpress.js",
+  "authors": [
+    "Kyle Robinson Young @shama & Tobias Koppers @sokra"
+  ],
+  "description": "A jQuery plugin to build a website on the infinite canvas.",
+  "main": "./jmpress.js",
+  "keywords": [
+    "animation",
+    "impress",
+    "presentation"
+  ],
+  "license": "MIT"
+}

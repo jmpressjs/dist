@@ -1,8 +1,10 @@
 {
   "name": "jmpress",
+  "repo": "jmpressjs/dist",
+  "description": "A jQuery plugin to build a website on the infinite canvas.",
   "version": "0.4.5",
-  "main": ["./jmpress.js"],
-  "dependencies": {
-    "jquery": "~1.7.2"
-  }
+  "scripts": [
+    "jmpress.js"
+  ],
+  "main": "jmpress.js"
 }
